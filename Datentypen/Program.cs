@@ -75,6 +75,9 @@ namespace Datentypen
 
             Console.WriteLine(@"Das Enterzeichen macht man mit \n"); // @ schaltet alle befehle aus und nutzt den text so wie er ist
 
+            // spezielle möglichkeit im Write und WriteLine. Ist ähnlich dem PrintF aus C.
+            Console.WriteLine("Werte sind: {0} {2} {1}", Buchstabe, 22, Text);
+
 
             // Operatoren
 
