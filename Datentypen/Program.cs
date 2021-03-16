@@ -5,7 +5,7 @@ namespace Datentypen
 {
     class Program
     {
-        static void Main( )
+        static void Main()
         {
             // Wertetypen
 
@@ -14,7 +14,7 @@ namespace Datentypen
             MeinByte = 1; // variable auf 1 stellen.
 
             bool EinBit; // true(1) oder false (0)
-            
+
             byte NurEinByte; // 0 - 255
             sbyte ByteMitVorzeichen; // -128 - 127
 
@@ -63,7 +63,7 @@ namespace Datentypen
             char Buchstabe; // 2 Byte "UTF-16"
             Buchstabe = 'Z';
             Console.WriteLine(Buchstabe); // Gibt Z aus
-            Console.WriteLine( (byte)Buchstabe); // gibt 90 aus (ASCII-Tabelle)
+            Console.WriteLine((byte)Buchstabe); // gibt 90 aus (ASCII-Tabelle)
 
 
             string Text;
@@ -116,22 +116,42 @@ namespace Datentypen
 
             Uebung = 10;
             // Uebung 12          11    + 11
-            Console.WriteLine( ++Uebung + Uebung++ ); // ausgabe 22, Uebung ist danach 12
+            Console.WriteLine(++Uebung + Uebung++); // ausgabe 22, Uebung ist danach 12
 
             int A = 5;
             int B = 7;
-            Console.WriteLine( A++ + --B ); // ausgabe 11, A und B sind danach 6
+            Console.WriteLine(A++ + --B); // ausgabe 11, A und B sind danach 6
 
             A = 5;
             B = 7;
 
             // A=5 B=8          8  /   4
-            Console.WriteLine( ++B / --A ); // ausgabe 2
+            Console.WriteLine(++B / --A); // ausgabe 2
 
             //                 1  +  7
-            Console.WriteLine( --B / A++ + B++ ); // ausgabe 8
+            Console.WriteLine(--B / A++ + B++); // ausgabe 8
 
 
+            A = 5;
+            B = 7;
+            Console.WriteLine( $" Das Ergebnis ist : {( (float)A / B ).ToString("0.00") } ");
+            /*
+            1. klammern auflösen,
+            1.1 A auslesen und zu float konvertieren
+            1.2 B auslesen
+            1.3 B implizit zu float konvertieren da teilen erfordert das beide werte
+                  den gleichen datentypen haben
+            1.4 Divisionsfunktion ausführen mit den beiden float-werten 5.0f und 7.0f
+            1.5 Rückgabe der Divisionsfunktion wird empfangen
+            2   Auf dem float wird die methode ToString() gestartet welche den float über die
+                ASCII-Tabelle in einen string verwandelt.
+            2.1 Der string wird zurechtgeschnitten anhand des Parameterstrings "0.00"
+                welches besagt das zwar alle stellen vor, aber nur 2 stellen nach dem komma gezeigt
+                werden sollen.
+            3.  Geschweifte klammern werden aufgelöst und der Text der berechnung und der statische
+                text werden in einen neuen string kopiert
+            4.  der gesamte text wird über die methode writeline ausgegeben
+            */
         }
     }
 }
