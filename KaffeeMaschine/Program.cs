@@ -15,6 +15,7 @@ namespace KaffeeMaschine
                 Aufgabe 2: Eine Wartungsoption
                     Wenn wartung eingegeben wird werden die Kontainer wieder auf Maximum befüllt
 
+                Aufgabe 3: füllstand wird dem Nutzer als Prozentbalken angezeigt
             */
             Console.WriteLine("Hallo Nutzer, die Kaffeemaschine ist einsatzbereit!"); //Begrüssung ausgeben
 
