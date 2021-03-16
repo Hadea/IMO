@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace KaffeeMaschine
 {
@@ -31,10 +32,14 @@ namespace KaffeeMaschine
             byte progressMaximum = 40;
 
 
-            Console.Write("Hallo Nutzer,"); //Begrüssung ausgeben
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(" die Kaffeemaschine ist einsatzbereit!"); //Begrüssung ausgeben
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.ForegroundColor = ConsoleColor.Cyan;
+
+            using (StreamReader fs = new StreamReader("logo.txt"))
+            {
+                Console.WriteLine(fs.ReadToEnd());
+            }// macht automatisch das .Dispose() so dass man es nicht mehr vergessen kann.
+
+            Console.WriteLine("\n");
             Console.ResetColor();
 
             bool keepRunning = true;
@@ -43,53 +48,57 @@ namespace KaffeeMaschine
 
                 int numberOfHashTags = containerCoffee / (containerCoffeeMax / progressMaximum);
 
-                Console.Write("Kaffee: |");
+                Console.Write("Kaffee: ");
                 for (int i = 0; i < progressMaximum; i++)
                 {
                     if (i < numberOfHashTags)
                     {
-                        Console.Write("#");
+                        Console.BackgroundColor = ConsoleColor.DarkGreen;
                     }
                     else
                     {
-                        Console.Write(" ");
+                        Console.BackgroundColor = ConsoleColor.DarkGray;
                     }
+                    Console.Write(" ");
                 }
-                Console.WriteLine("|");
 
-                Console.Write("Wasser: |");
+                Console.ResetColor();
+
+                Console.Write("\nWasser: ");
                 numberOfHashTags = containerWater / (containerWaterMax / progressMaximum);
                 for (int i = 0; i < progressMaximum; i++)
                 {
                     if (i < numberOfHashTags)
                     {
-                        Console.Write("#");
+                        Console.BackgroundColor = ConsoleColor.DarkGreen;
                     }
                     else
                     {
-                        Console.Write(" ");
+                        Console.BackgroundColor = ConsoleColor.DarkGray;
                     }
+                    Console.Write(" ");
                 }
-                Console.WriteLine("|");
 
-                Console.Write("Tee   : |");
+                Console.ResetColor();
+
+                Console.Write("\nTee   : ");
                 numberOfHashTags = containerTea / (containerTeaMax / progressMaximum);
                 for (int i = 0; i < progressMaximum; i++)
                 {
                     if (i < numberOfHashTags)
                     {
-                        Console.Write("#");
+                        Console.BackgroundColor = ConsoleColor.DarkGreen;
                     }
                     else
                     {
-                        Console.Write(" ");
+                        Console.BackgroundColor = ConsoleColor.DarkGray;
                     }
+                    Console.Write(" ");
                 }
-                Console.WriteLine("|");
-
+                Console.ResetColor();
 
                 //Kaffee/Tee Auswahlmenü anzeigen
-                Console.WriteLine("\n\n");
+                Console.WriteLine("\n");
                 Console.WriteLine("Kaffee -> Schöner schwarzer heisser kaffe, junge");
                 Console.WriteLine("Tee    -> Schwarzer Tee aus biologischem Anbau");
                 Console.WriteLine("Wasser -> Heisses Wasser");
