@@ -6,7 +6,16 @@ namespace KaffeeMaschine
     {
         static void Main(string[] args) //               doppelklick auf exe
         {
+            /*
+                Aufgabe 1: Kaffeemaschine um Kontainer erweitern
+                    Jedes Getränk zieht aus den Kontainern etwas ab
+                    Wenn nicht mehr genug vorhanden ist wird anstelle des getränks 
+                    eine fehlermeldung gezeigt.
+                
+                Aufgabe 2: Eine Wartungsoption
+                    Wenn wartung eingegeben wird werden die Kontainer wieder auf Maximum befüllt
 
+            */
             Console.WriteLine("Hallo Nutzer, die Kaffeemaschine ist einsatzbereit!"); //Begrüssung ausgeben
 
             bool keepRunning = true;
