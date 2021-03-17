@@ -49,61 +49,18 @@ namespace KaffeeMaschine
                 int numberOfHashTags = containerCoffee / (containerCoffeeMax / progressMaximum);
 
                 Console.Write("Kaffee: ");
-                for (int i = 0; i < progressMaximum; i++)
-                {
-                    if (i < numberOfHashTags)
-                    {
-                        Console.BackgroundColor = ConsoleColor.DarkGreen;
-                    }
-                    else
-                    {
-                        Console.BackgroundColor = ConsoleColor.DarkGray;
-                    }
-                    Console.Write(" ");
-                }
-
-                Console.ResetColor();
+                drawProgress(numberOfHashTags, containerCoffeeMax);
 
                 Console.Write("\nWasser: ");
                 numberOfHashTags = containerWater / (containerWaterMax / progressMaximum);
-                for (int i = 0; i < progressMaximum; i++)
-                {
-                    if (i < numberOfHashTags)
-                    {
-                        Console.BackgroundColor = ConsoleColor.DarkGreen;
-                    }
-                    else
-                    {
-                        Console.BackgroundColor = ConsoleColor.DarkGray;
-                    }
-                    Console.Write(" ");
-                }
-
-                Console.ResetColor();
+                drawProgress(numberOfHashTags, progressMaximum);
 
                 Console.Write("\nTee   : ");
                 numberOfHashTags = containerTea / (containerTeaMax / progressMaximum);
-                for (int i = 0; i < progressMaximum; i++)
-                {
-                    if (i < numberOfHashTags)
-                    {
-                        Console.BackgroundColor = ConsoleColor.DarkGreen;
-                    }
-                    else
-                    {
-                        Console.BackgroundColor = ConsoleColor.DarkGray;
-                    }
-                    Console.Write(" ");
-                }
-                Console.ResetColor();
+                drawProgress(numberOfHashTags, progressMaximum);
 
                 //Kaffee/Tee Auswahlmenü anzeigen
-                Console.WriteLine("\n");
-                Console.WriteLine("Kaffee -> Schöner schwarzer heisser kaffe, junge");
-                Console.WriteLine("Tee    -> Schwarzer Tee aus biologischem Anbau");
-                Console.WriteLine("Wasser -> Heisses Wasser");
-                Console.WriteLine("Wartung -> Füllt die Container");
-                Console.WriteLine("Abschalten -> Schaltet die Maschine aus");
+                drawMenu();
 
                 string userInput;
                 userInput = Console.ReadLine(); //Nutzereingabe einlesen
@@ -203,6 +160,34 @@ namespace KaffeeMaschine
             } while (keepRunning);
 
             Console.WriteLine("Kaffeemaschine beendet sich");
+        }
+
+        static void drawMenu()
+        {
+            Console.WriteLine("\n");
+            Console.WriteLine("Kaffee -> Schöner schwarzer heisser kaffe, junge");
+            Console.WriteLine("Tee    -> Schwarzer Tee aus biologischem Anbau");
+            Console.WriteLine("Wasser -> Heisses Wasser");
+            Console.WriteLine("Wartung -> Füllt die Container");
+            Console.WriteLine("Abschalten -> Schaltet die Maschine aus");
+        }
+
+        static void drawProgress(int currentValue, int maximumValue)
+        {
+            for (int i = 0; i < maximumValue; i++)
+            {
+                if (i < currentValue)
+                {
+                    Console.BackgroundColor = ConsoleColor.DarkGreen;
+                }
+                else
+                {
+                    Console.BackgroundColor = ConsoleColor.DarkGray;
+                }
+                Console.Write(" ");
+            }
+
+            Console.ResetColor();
         }
     }
 }

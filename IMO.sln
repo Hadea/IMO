@@ -5,9 +5,11 @@ VisualStudioVersion = 16.0.31105.61
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Datentypen", "Datentypen\Datentypen.csproj", "{AB147832-D4D0-4004-9783-A8A43848A702}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kontrollstrukturen", "Kontrollstrukturen\Kontrollstrukturen.csproj", "{A845FCBD-9C8B-4E28-AA5F-8EE2FEA15D53}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kontrollstrukturen", "Kontrollstrukturen\Kontrollstrukturen.csproj", "{A845FCBD-9C8B-4E28-AA5F-8EE2FEA15D53}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KaffeeMaschine", "KaffeeMaschine\KaffeeMaschine.csproj", "{6A2237B1-9B51-47C2-9266-F990CFB5408E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KaffeeMaschine", "KaffeeMaschine\KaffeeMaschine.csproj", "{6A2237B1-9B51-47C2-9266-F990CFB5408E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Strukturierung", "Strukturierung\Strukturierung.csproj", "{B98BEC7D-ED47-44F7-8013-4D825BDDDAD5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{6A2237B1-9B51-47C2-9266-F990CFB5408E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A2237B1-9B51-47C2-9266-F990CFB5408E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A2237B1-9B51-47C2-9266-F990CFB5408E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B98BEC7D-ED47-44F7-8013-4D825BDDDAD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B98BEC7D-ED47-44F7-8013-4D825BDDDAD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B98BEC7D-ED47-44F7-8013-4D825BDDDAD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B98BEC7D-ED47-44F7-8013-4D825BDDDAD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
