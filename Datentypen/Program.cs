@@ -22,7 +22,7 @@ namespace Datentypen
             ushort ZweiByteOhneVorzeichen; // 0 - 65535
 
             int VierByte; // +/- 2,14 Milliarden
-            uint VierByteOhneVorzeichen; // 0 - 2,29 Milliarden
+            uint VierByteOhneVorzeichen; // 0 - 4,29 Milliarden
 
             Int64 AchtByte; // ca +/- 3 Trilliarden
 
