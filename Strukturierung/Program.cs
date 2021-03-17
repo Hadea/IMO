@@ -21,42 +21,109 @@ namespace Strukturierung
             PrintNumbersBetween(2, 7);
 
 
-            // Methode die eine Zahl entgegennimmt und entsprechend der zahl fibunacci-werte ausgibt
+            // Methode die eine Zahl entgegennimmt und entsprechend der zahl fibonacci-werte ausgibt
             // übergabe von 5, ausgabe 1 1 2 3 5
-            PrintFibunacci(5);
+            PrintFibonacci(60);
 
             // Methode um die Fakultät auszugeben   
             // übergabe 5, ausgabe 120   1 * 2 * 3 * 4 * 5
+            Console.WriteLine("Jetzt kommt fakultät");
+            PrintFaculty(5);
+
+            // PreIncrement       ++i zählt eine Variable rauf, gibt den neuen wert zurück
+            // parameter 5, rückgabe 6, ausgabe 6
+
+            int rueckgabe = PreIncrement(5);
+            Console.WriteLine(rueckgabe);
+
+            // PostIncrement      i++  zählt eine Variable rauf, aber gibt den alten wert zurück
+            // parameter 5, rückgabewert 5, ausgabe 6
+
+            rueckgabe = PostIncrement(5);
+            Console.WriteLine(rueckgabe);
+
+
+            int zaehler = 0;
+            int[] zahlenArray = new int[10];
+
+            while (zaehler < zahlenArray.Length)
+                Console.WriteLine(zahlenArray[zaehler++] );
+
         }
 
-        static void PrintFibunacci(int AnzahlDerWerte)
+        static int PostIncrement(int v)
+        {
+            v = v + 1;
+            Console.WriteLine(v);
+            return v - 1;
+        }
+
+        static int PreIncrement(int v)
+        {
+            v = v + 1;
+            Console.WriteLine(v);
+            return v;
+        }
+
+        static void PrintFaculty(int v)
         {
 
-            int ausgabeZahl = 1;
-            //    1               1
-            int alterWert = ausgabeZahl;
-            while (ausgabeZahl < 11)
+            int ergebnis = 1;
+            for (int counter = 1; counter <= v; counter++)
             {
-                //                      1
-                Console.WriteLine(ausgabeZahl);
-                //  2              1            1
-                ausgabeZahl = ausgabeZahl + alterWert;
+                //Console.WriteLine("Multipliziere {0} und {1}", ergebnis,counter);
+                ergebnis *= counter;
             }
 
-            /* AnzahlDerWerte = 5
-             * 
-             * A 2
-             * B 3
-             * ausgabe 5
-             * 
-             * solange eine bedingung erfüllt ist
-             *      ausgabe überschreiben mit  A plus B
-             *      ausgabe auf den Bildschirm bringen
-             *      A überschreiben mit B
-             *      B überschreiben mit ausgabe
-             * ende solange
-             * 
-             */
+            Console.WriteLine(ergebnis);
+        }
+
+        /// <summary>
+        /// Gibt die gewünschte anzahl an fibunacci ziffern aus
+        /// </summary>
+        /// <param name="AnzahlDerWerte">Die anzahl der Ziffern die ausgegeben werden sollen</param>
+        static void PrintFibonacci(byte AnzahlDerWerte) // 0 < AnzahlDerWerte < 47
+        {
+            if (AnzahlDerWerte == 0)
+            {
+                return;
+            }
+
+            if (AnzahlDerWerte > 46)
+            {
+                return;
+            }
+
+            int A = 0;// A 2
+            int B = 1;// B 3
+            int sum;// ausgabe 5
+            Console.WriteLine("1 ");
+
+            while (AnzahlDerWerte > 1)// solange eine bedingung erfüllt ist
+            {
+                sum = A + B;//      ausgabe überschreiben mit  A plus B
+                Console.WriteLine(sum + " "); //      ausgabe auf den Bildschirm bringen
+                A = B; //      A überschreiben mit B
+                B = sum; //      B überschreiben mit ausgabe
+                AnzahlDerWerte--;
+            } // ende solange
+
+            // [‎17.‎03.‎2021 14:31] Adam Brodowy: 
+            //int number1 = 0;
+            //int number2 = 1;
+            //int number3;
+            //int i;
+
+            //number3 = number1 + number2;
+            //Console.Write(number1 + " " + number2 + " ");
+
+            //for (i = 2; i < 6; ++i)
+            //{
+            //    number3 = number1 + number2;
+            //    Console.Write(number3 + " ");
+            //    number1 = number2;
+            //    number2 = number3;
+            //}
         }
 
         static void PrintNumbersBetween(int Anfang, int Ende)
