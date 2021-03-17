@@ -23,12 +23,45 @@ namespace Strukturierung
 
             // Methode die eine Zahl entgegennimmt und entsprechend der zahl fibunacci-werte ausgibt
             // übergabe von 5, ausgabe 1 1 2 3 5
+            PrintFibunacci(5);
 
+            // Methode um die Fakultät auszugeben   
+            // übergabe 5, ausgabe 120   1 * 2 * 3 * 4 * 5
+        }
+
+        static void PrintFibunacci(int AnzahlDerWerte)
+        {
+
+            int ausgabeZahl = 1;
+            //    1               1
+            int alterWert = ausgabeZahl;
+            while (ausgabeZahl < 11)
+            {
+                //                      1
+                Console.WriteLine(ausgabeZahl);
+                //  2              1            1
+                ausgabeZahl = ausgabeZahl + alterWert;
+            }
+
+            /* AnzahlDerWerte = 5
+             * 
+             * A 2
+             * B 3
+             * ausgabe 5
+             * 
+             * solange eine bedingung erfüllt ist
+             *      ausgabe überschreiben mit  A plus B
+             *      ausgabe auf den Bildschirm bringen
+             *      A überschreiben mit B
+             *      B überschreiben mit ausgabe
+             * ende solange
+             * 
+             */
         }
 
         static void PrintNumbersBetween(int Anfang, int Ende)
         {
-            for (int count = Anfang+1; count < Ende; count++)
+            for (int count = Anfang + 1; count < Ende; count++)
             {
                 Console.WriteLine(count);
             }
