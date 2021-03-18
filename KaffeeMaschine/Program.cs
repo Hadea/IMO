@@ -36,9 +36,9 @@ namespace KaffeeMaschine
             else //andernfalls
             {
                 //     Standardwerte nutzen für ersten start. 
-                containerCoffee = 200;
-                containerTea = 200;
-                containerWater = 200;
+                containerCoffee = 0;
+                containerTea = 0;
+                containerWater = 0;
             }//ende Wenn
 
             string logo;
@@ -52,7 +52,7 @@ namespace KaffeeMaschine
             bool keepRunning = true;
             do
             {
-                Console.Clear();
+                Console.Clear(); //leert den Bildschirm und setzt den cursor nach oben links  (0,0)
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine(logo);
                 Console.ResetColor();
@@ -206,7 +206,7 @@ namespace KaffeeMaschine
             Console.Write("Bitte warten ");
             for (int counter = 0; counter < 10; counter++)
             {
-                Thread.Sleep(200);
+                Thread.Sleep(200); // pausiert für 200 Millisekunden
                 Console.Write(".");
             }
 
