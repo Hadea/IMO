@@ -94,6 +94,24 @@ namespace Datentypen
             float Delta = 10;
             float ErgebnisMitKomma = Charly / Delta; // Dividiert, 0.5 
 
+            // operatoren für bool
+
+            bool ergebnis = false || true; // or
+            // 1. linker wert wird überprüft ob er true ist, falls ja steht das ergebnis auf true
+            // 2. rechter wert wird überprüft ob er true ist, falls ja steht das ergebnis auf true
+            ergebnis = true && false; // and
+            // sollte der erste wert bereits false sein steht das ergebnis fest auf false
+            
+            // wenn and und or gemischt verwendet werden immer klammern verwenden
+
+            int test = 20;
+
+            //   false      &&    (   true )
+            if (test < 20 && (test > 2 || test % 5 == 0))
+            {
+
+            }
+
             // Kurzschreibweisen für operatoren
 
 
