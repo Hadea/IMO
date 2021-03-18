@@ -19,17 +19,20 @@ namespace Serialisierung
             {
                 serializer.Serialize(writer, data);
             }
-            
+
             DataContainer dataFromDisk;
 
-            using (var reader = new StreamReader("data.xml"))
+            if (File.Exists("data.xml"))
             {
-                dataFromDisk = (DataContainer)serializer.Deserialize(reader);
-            }
+                using (var reader = new StreamReader("data.xml"))
+                {
+                    dataFromDisk = (DataContainer)serializer.Deserialize(reader);
+                }
 
-            Console.WriteLine(dataFromDisk.NumberA);
-            Console.WriteLine(dataFromDisk.BitB);
-            Console.WriteLine(dataFromDisk.TextC);
+                Console.WriteLine(dataFromDisk.NumberA);
+                Console.WriteLine(dataFromDisk.BitB);
+                Console.WriteLine(dataFromDisk.TextC);
+            }
         }
     }
 
