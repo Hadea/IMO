@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
+using System.Xml.Serialization;
 
 namespace KaffeeMaschine
 {
@@ -7,42 +9,57 @@ namespace KaffeeMaschine
     {
         static void Main(string[] args) // doppelklick auf exe
         {
+            XmlSerializer serializer = new XmlSerializer(typeof(BoxData));
 
-            // TODO: Einlesen
-            /*
-             * Wenn Container.xml vorhanden 
-             *      Container.xml einlesen
-             * andernfalls
-             *      Standardwerte nutzen
-             * ende Wenn
-             */
+            byte containerCoffee;
+            byte containerWater;
+            byte containerTea;
 
-            byte containerCoffee = 120;
-            byte containerWater = 44;
-            byte containerTea = 30;
             byte containerCoffeeMax = 200;
             byte containerWaterMax = 200;
             byte containerTeaMax = 200;
+
             byte progressMaximum = 40;
+            string fileName = "data.xml";
 
+            // TODO: Einlesen
+            if (File.Exists(fileName))//Wenn data.xml vorhanden 
+            {
+                using (var reader = new StreamReader(fileName))//     data.xml einlesen
+                {
+                    BoxData data = (BoxData)serializer.Deserialize(reader);
+                    containerCoffee = data.Coffee;
+                    containerTea = data.Tea;
+                    containerWater = data.Water;
+                }
+            }
+            else //andernfalls
+            {
+                //     Standardwerte nutzen für ersten start. 
+                containerCoffee = 200;
+                containerTea = 200;
+                containerWater = 200;
+            }//ende Wenn
 
-            Console.ForegroundColor = ConsoleColor.Cyan;
+            string logo;
 
             using (StreamReader fs = new StreamReader("logo.txt"))
             {
-                Console.WriteLine(fs.ReadToEnd());
+                logo = fs.ReadToEnd();
             }// macht automatisch das .Dispose() so dass man es nicht mehr vergessen kann.
 
-            Console.WriteLine("\n");
-            Console.ResetColor();
 
             bool keepRunning = true;
             do
             {
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine(logo);
+                Console.ResetColor();
 
                 int numberOfHashTags = containerCoffee / (containerCoffeeMax / progressMaximum);
 
-                Console.Write("Kaffee: ");
+                Console.Write("\nKaffee: ");
                 drawProgress(numberOfHashTags, progressMaximum);
 
                 Console.Write("\nWasser: ");
@@ -73,12 +90,12 @@ namespace KaffeeMaschine
                         if (containerTea < 5) // hab ich genug tee?
                         {
                             readyForDispense = false; // wenn zu wenig tee, dann können wir nicht brauen
-                            Console.WriteLine("Nicht genug Tee");
+                            displayError("Tee");
                         }
 
                         if (containerWater < 10)// hab ich genug wasser?
                         {
-                            Console.WriteLine("Nicht genug Wasser");
+                            displayError("Wasser");
                             readyForDispense = false;// wenn zu wenig wasser, dann können wir nicht brauen, egal ob genug tee da war
                         }
 
@@ -86,7 +103,7 @@ namespace KaffeeMaschine
                         {
                             containerWater -= 10;
                             containerTea -= 5;
-                            Console.WriteLine("Hier ist ihr Tee");
+                            dispense(userInput);
                         }
                         else
                         {
@@ -109,24 +126,24 @@ namespace KaffeeMaschine
                     case "Wasser":
                         if (containerWater < 10)
                         {
-                            Console.WriteLine("Nicht genug Wasser");
+                            displayError("Wasser");
                         }
                         else
                         {
-                            Console.WriteLine("Wasser wird ausgegeben"); //Getränk ausgeben
                             containerWater -= 10;
+                            dispense(userInput);//Getränk ausgeben
                         }
                         break;
                     case "Kaffee":
                         if (containerCoffee < 5) // hab ich genug Kaffee?
                         {
                             readyForDispense = false; // wenn zu wenig tee, dann können wir nicht brauen
-                            Console.WriteLine("Nicht genug Kaffee");
+                            displayError("Kaffee");
                         }
 
                         if (containerWater < 10)// hab ich genug wasser?
                         {
-                            Console.WriteLine("Nicht genug Wasser");
+                            displayError("Wasser");
                             readyForDispense = false;// wenn zu wenig wasser, dann können wir nicht brauen, egal ob genug tee da war
                         }
 
@@ -134,7 +151,7 @@ namespace KaffeeMaschine
                         {
                             containerWater -= 10;
                             containerCoffee -= 5;
-                            Console.WriteLine("Hier ist ihr Kaffee");
+                            dispense(userInput);
                         }
                         else
                         {
@@ -144,7 +161,7 @@ namespace KaffeeMaschine
                         Console.WriteLine("Kaffee wird ausgegeben"); //Getränk ausgeben
                         break;
                     case "Abschalten":
-                        Console.WriteLine("dann bekommen sie eben nix"); //Getränk ausgeben
+                        Console.WriteLine("Auf Wiedersehen!"); 
                         keepRunning = false;
                         break;
                     default:
@@ -153,15 +170,48 @@ namespace KaffeeMaschine
                 }
             } while (keepRunning);
 
-            Console.WriteLine("Kaffeemaschine beendet sich");
+            Console.Write("Kaffeemaschine speichert ... ");
 
             //TODO: speichern
 
-            /*
-             * Schreibzugriff auf datei anfordern
-             * Werte der Containervariablen in Hilfsobjekt packen
-             * Hilfsobjekt in XML umwandeln und in die datei speichern
-             */
+            using (var writer = new StreamWriter(fileName))// Schreibzugriff auf datei anfordern
+            {
+                // Werte der Containervariablen in Hilfsobjekt packen
+                BoxData data = new BoxData();
+                data.Coffee = containerCoffee;
+                data.Tea = containerTea;
+                data.Water = containerWater;
+
+                // Hilfsobjekt in XML umwandeln und in die datei speichern
+                serializer.Serialize(writer, data);
+            }
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("erledigt.");
+            Console.ResetColor();
+            Console.WriteLine("Kaffeemaschine beendet sich");
+
+        }
+
+        private static void displayError(string ContainerName)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Fehler: nicht genügend inhalt in Container: " + ContainerName);
+            Console.ResetColor();
+            Thread.Sleep(2000);
+        }
+
+        private static void dispense(string userInput)
+        {
+            Console.Write("Bitte warten ");
+            for (int counter = 0; counter < 10; counter++)
+            {
+                Thread.Sleep(200);
+                Console.Write(".");
+            }
+
+            Console.WriteLine("\nHier ist ihr " + userInput);
+            Thread.Sleep(2000);
         }
 
         static void drawMenu()
@@ -191,5 +241,12 @@ namespace KaffeeMaschine
 
             Console.ResetColor();
         }
+    }
+
+    public class BoxData
+    {
+        public byte Coffee;
+        public byte Water;
+        public byte Tea;
     }
 }
