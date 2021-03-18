@@ -7,22 +7,16 @@ namespace KaffeeMaschine
     {
         static void Main(string[] args) // doppelklick auf exe
         {
+
+            // TODO: Einlesen
             /*
-                Aufgabe 1: Kaffeemaschine um Kontainer erweitern
-                    Jedes Getränk zieht aus den Kontainern etwas ab
-                    Wenn nicht mehr genug vorhanden ist wird anstelle des getränks 
-                    eine fehlermeldung gezeigt.
-                
-                Aufgabe 2: Eine Wartungsoption
-                    Wenn wartung eingegeben wird werden die Kontainer wieder auf Maximum befüllt
+             * Wenn Container.xml vorhanden 
+             *      Container.xml einlesen
+             * andernfalls
+             *      Standardwerte nutzen
+             * ende Wenn
+             */
 
-                Aufgabe 3: füllstand wird dem Nutzer als Prozentbalken angezeigt
-
-                        byte KaffeKontainer  = 50; // max 200
-                        byte Ergebnis = aktuellFüllung / ( MaxFüllstand / MaxProzentBreite )
-
-                        |###########################_________________________|
-            */
             byte containerCoffee = 120;
             byte containerWater = 44;
             byte containerTea = 30;
@@ -49,7 +43,7 @@ namespace KaffeeMaschine
                 int numberOfHashTags = containerCoffee / (containerCoffeeMax / progressMaximum);
 
                 Console.Write("Kaffee: ");
-                drawProgress(numberOfHashTags, containerCoffeeMax);
+                drawProgress(numberOfHashTags, progressMaximum);
 
                 Console.Write("\nWasser: ");
                 numberOfHashTags = containerWater / (containerWaterMax / progressMaximum);
@@ -160,6 +154,14 @@ namespace KaffeeMaschine
             } while (keepRunning);
 
             Console.WriteLine("Kaffeemaschine beendet sich");
+
+            //TODO: speichern
+
+            /*
+             * Schreibzugriff auf datei anfordern
+             * Werte der Containervariablen in Hilfsobjekt packen
+             * Hilfsobjekt in XML umwandeln und in die datei speichern
+             */
         }
 
         static void drawMenu()
