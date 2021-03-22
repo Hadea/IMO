@@ -10,11 +10,13 @@ namespace KaffeeMaschine
         const byte containerCoffeeMax = 200;
         const byte containerWaterMax = 200;
         const byte containerTeaMax = 200;
-        const string fileName = "Settings.db";
         const byte progressMaximum = 40;
+        const string fileName = "Settings.db";
         static byte containerCoffee;
         static byte containerWater;
         static byte containerTea;
+        static string logo;
+
 
         static void Main(string[] args) // doppelklick auf exe
         {
@@ -25,20 +27,7 @@ namespace KaffeeMaschine
                 return; // kaffeemaschine nicht hochfahren sondern direkt beenden
             }
 
-            // TODO: Einlesen
-            if (File.Exists(fileName))//Wenn Datenbank vorhanden 
-            {
-                LoadContainerDB();
-            }
-            else //andernfalls
-            {
-                //     Standardwerte nutzen für ersten start. 
-                containerCoffee = 0;
-                containerTea = 0;
-                containerWater = 0;
-            }//ende Wenn
-
-            string logo;
+            LoadContainerDB();
 
             using (StreamReader fs = new("logo.txt"))
             {
@@ -46,127 +35,128 @@ namespace KaffeeMaschine
             }// macht automatisch das .Dispose() so dass man es nicht mehr vergessen kann.
 
 
-            bool keepRunning = true;
             do
             {
                 Console.Clear(); //leert den Bildschirm und setzt den cursor nach oben links  (0,0)
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine(logo);
-                Console.ResetColor();
+                drawLogo();
+                drawProgressBars();
+                drawMenu();//Kaffee/Tee Auswahlmenü anzeigen
+            } while (handleInput());
 
-
-                Console.Write("\nKaffee: ");
-                int filledFields = containerCoffee / (containerCoffeeMax / progressMaximum);
-                drawProgress(filledFields);
-
-                Console.Write("\nWasser: ");
-                filledFields = containerWater / (containerWaterMax / progressMaximum);
-                drawProgress(filledFields);
-
-                Console.Write("\nTee   : ");
-                filledFields = containerTea / (containerTeaMax / progressMaximum);
-                drawProgress(filledFields);
-
-                //Kaffee/Tee Auswahlmenü anzeigen
-                drawMenu();
-
-                string userInput;
-                userInput = Console.ReadLine(); //Nutzereingabe einlesen
-
-                bool readyForDispense = true;
-                switch (userInput)
-                {
-                    case "Wartung":
-                        containerWater = containerWaterMax;
-                        containerTea = containerTeaMax;
-                        containerCoffee = containerCoffeeMax;
-                        Console.WriteLine("Wartung durchgeführt, alle Container wieder voll");
-                        break;
-                    case "Tee":
-                        // prinzipiell würde tee gehen, ich schau mal nach
-                        if (containerTea < 5) // hab ich genug tee?
-                        {
-                            readyForDispense = false; // wenn zu wenig tee, dann können wir nicht brauen
-                            displayError("Tee");
-                        }
-
-                        if (containerWater < 10)// hab ich genug wasser?
-                        {
-                            displayError("Wasser");
-                            readyForDispense = false;// wenn zu wenig wasser, dann können wir nicht brauen, egal ob genug tee da war
-                        }
-
-                        if (readyForDispense)// haben wir nach allen prüfungen immer noch ein OK zum brauen?
-                        {
-                            containerWater -= 10;
-                            containerTea -= 5;
-                            dispense(userInput);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Leider hat eine Prüfung nicht geklappt, bitte wählen sie ein anderes Produkt");
-                        }
-                        break;
-                    case "Wasser":
-                        if (containerWater < 10)
-                        {
-                            displayError("Wasser");
-                        }
-                        else
-                        {
-                            containerWater -= 10;
-                            dispense(userInput);//Getränk ausgeben
-                        }
-                        break;
-                    case "Kaffee":
-                        if (containerCoffee < 5) // hab ich genug Kaffee?
-                        {
-                            readyForDispense = false; // wenn zu wenig tee, dann können wir nicht brauen
-                            displayError("Kaffee");
-                        }
-
-                        if (containerWater < 10)// hab ich genug wasser?
-                        {
-                            displayError("Wasser");
-                            readyForDispense = false;// wenn zu wenig wasser, dann können wir nicht brauen, egal ob genug tee da war
-                        }
-
-                        if (readyForDispense)// haben wir nach allen prüfungen immer noch ein OK zum brauen?
-                        {
-                            containerWater -= 10;
-                            containerCoffee -= 5;
-                            dispense(userInput);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Leider hat eine Prüfung nicht geklappt, bitte wählen sie ein anderes Produkt");
-                        }
-                        break;
-                    case "Abschalten":
-                        Console.WriteLine("Auf Wiedersehen!");
-                        keepRunning = false;
-                        break;
-                    default:
-                        Console.WriteLine("Die Eingabe kenne ich nicht"); // fehler
-                        break;
-                }
-            } while (keepRunning);
-
-            Console.Write("Kaffeemaschine speichert ... ");
-
-            //TODO: speichern
             if (!File.Exists(fileName))
             {
-                // Datenbank existiert nicht, also neu erzeugen.
-                CreateDB();
+                CreateDB();// Datenbank existiert nicht, also neu erzeugen.
             }
             SaveContainerDB();
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("erledigt.");
-            Console.ResetColor();
             Console.WriteLine("Kaffeemaschine beendet sich");
 
+        }
+
+        static void drawLogo()
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(logo);
+            Console.ResetColor();
+        }
+
+        static bool handleInput()
+        {
+            string userInput;
+            userInput = Console.ReadLine(); //Nutzereingabe einlesen
+
+            bool readyForDispense = true;
+            switch (userInput)
+            {
+                case "Wartung":
+                    containerWater = containerWaterMax;
+                    containerTea = containerTeaMax;
+                    containerCoffee = containerCoffeeMax;
+                    Console.WriteLine("Wartung durchgeführt, alle Container wieder voll");
+                    break;
+                case "Tee":
+                    // prinzipiell würde tee gehen, ich schau mal nach
+                    if (containerTea < 5) // hab ich genug tee?
+                    {
+                        readyForDispense = false; // wenn zu wenig tee, dann können wir nicht brauen
+                        displayError("Tee");
+                    }
+
+                    if (containerWater < 10)// hab ich genug wasser?
+                    {
+                        displayError("Wasser");
+                        readyForDispense = false;// wenn zu wenig wasser, dann können wir nicht brauen, egal ob genug tee da war
+                    }
+
+                    if (readyForDispense)// haben wir nach allen prüfungen immer noch ein OK zum brauen?
+                    {
+                        containerWater -= 10;
+                        containerTea -= 5;
+                        dispense(userInput);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Leider hat eine Prüfung nicht geklappt, bitte wählen sie ein anderes Produkt");
+                    }
+                    break;
+                case "Wasser":
+                    if (containerWater < 10)
+                    {
+                        displayError("Wasser");
+                    }
+                    else
+                    {
+                        containerWater -= 10;
+                        dispense(userInput);//Getränk ausgeben
+                    }
+                    break;
+                case "Kaffee":
+                    if (containerCoffee < 5) // hab ich genug Kaffee?
+                    {
+                        readyForDispense = false; // wenn zu wenig tee, dann können wir nicht brauen
+                        displayError("Kaffee");
+                    }
+
+                    if (containerWater < 10)// hab ich genug wasser?
+                    {
+                        displayError("Wasser");
+                        readyForDispense = false;// wenn zu wenig wasser, dann können wir nicht brauen, egal ob genug tee da war
+                    }
+
+                    if (readyForDispense)// haben wir nach allen prüfungen immer noch ein OK zum brauen?
+                    {
+                        containerWater -= 10;
+                        containerCoffee -= 5;
+                        dispense(userInput);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Leider hat eine Prüfung nicht geklappt, bitte wählen sie ein anderes Produkt");
+                    }
+                    break; ;
+                case "Abschalten":
+                    Console.WriteLine("Auf Wiedersehen!");
+                    return false;
+                default:
+                    Console.WriteLine("Die Eingabe kenne ich nicht"); // fehler
+                    break;
+            }
+            return true;
+        }
+
+        static void drawProgressBars()
+        {
+            Console.Write("\nKaffee: ");
+            int filledFields = containerCoffee / (containerCoffeeMax / progressMaximum);
+            drawProgress(filledFields);
+
+            Console.Write("\nWasser: ");
+            filledFields = containerWater / (containerWaterMax / progressMaximum);
+            drawProgress(filledFields);
+
+            Console.Write("\nTee   : ");
+            filledFields = containerTea / (containerTeaMax / progressMaximum);
+            drawProgress(filledFields);
         }
 
         static void processArgs(string[] args)
@@ -211,7 +201,7 @@ PARAMETER
             }
         }
 
-        private static void CreateDB()
+        static void CreateDB()
         {
             if (File.Exists(fileName))
             {
@@ -274,31 +264,41 @@ PARAMETER
             }
         }
 
-        private static void LoadContainerDB()
+        static void LoadContainerDB()
         {
-            SQLiteConnectionStringBuilder builder = new SQLiteConnectionStringBuilder();
-            builder.Version = 3;
-            builder.DataSource = fileName;
-            builder.FailIfMissing = true;
-
-            using (SQLiteConnection connection = new SQLiteConnection(builder.ToString()))
+            if (File.Exists(fileName))//Wenn Datenbank vorhanden 
             {
-                connection.Open();
-                SQLiteCommand command = connection.CreateCommand();
-                command.CommandText = "select coffeeContainer, waterContainer, teaContainer from SavedSettings;";
-                using (var resultReader = command.ExecuteReader())
+                SQLiteConnectionStringBuilder builder = new SQLiteConnectionStringBuilder();
+                builder.Version = 3;
+                builder.DataSource = fileName;
+                builder.FailIfMissing = true;
+
+                using (SQLiteConnection connection = new SQLiteConnection(builder.ToString()))
                 {
-                    resultReader.Read();
-                    containerCoffee = resultReader.GetByte(0);// coffeeContainer
-                    containerWater = resultReader.GetByte(1);// waterContainer
-                    containerTea = resultReader.GetByte(2);// teaContainer
+                    connection.Open();
+                    SQLiteCommand command = connection.CreateCommand();
+                    command.CommandText = "select coffeeContainer, waterContainer, teaContainer from SavedSettings;";
+                    using (var resultReader = command.ExecuteReader())
+                    {
+                        resultReader.Read();
+                        containerCoffee = resultReader.GetByte(0);// coffeeContainer
+                        containerWater = resultReader.GetByte(1);// waterContainer
+                        containerTea = resultReader.GetByte(2);// teaContainer
+                    }
                 }
             }
+            else //andernfalls
+            {
+                //     Standardwerte nutzen für ersten start. 
+                containerCoffee = 0;
+                containerTea = 0;
+                containerWater = 0;
+            }//ende Wenn
         }
 
-        private static void SaveContainerDB()
+        static void SaveContainerDB()
         {
-
+            Console.WriteLine("Speichere aktuelle einstellungen ... ");
             SQLiteConnectionStringBuilder builder = new SQLiteConnectionStringBuilder();
             builder.Version = 3;
             builder.DataSource = fileName;
@@ -315,9 +315,12 @@ PARAMETER
                 //TODO: favorit/letzte auswahl speichern
                 command.ExecuteNonQuery();
             }
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("erledigt");
+            Console.ResetColor();
         }
 
-        private static void displayError(string ContainerName)
+        static void displayError(string ContainerName)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Fehler: nicht genügend inhalt in Container: " + ContainerName);
@@ -325,7 +328,7 @@ PARAMETER
             Thread.Sleep(2000);
         }
 
-        private static void dispense(string userInput)
+        static void dispense(string userInput)
         {
             Console.Write("Bitte warten ");
             for (int counter = 0; counter < 10; counter++)
