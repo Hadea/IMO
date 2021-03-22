@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.SQLite;
 using System.IO;
 using System.Threading;
 using System.Xml.Serialization;
@@ -7,7 +8,7 @@ namespace KaffeeMaschine
 {
     class Program
     {
-        static void Main(string[] args) // doppelklick auf exe
+        static void Main() // doppelklick auf exe
         {
             XmlSerializer serializer = new XmlSerializer(typeof(BoxData));
 
@@ -20,18 +21,38 @@ namespace KaffeeMaschine
             byte containerTeaMax = 200;
 
             byte progressMaximum = 40;
-            string fileName = "data.xml";
+            string fileName = "Settings.db";
+
+            SQLiteConnectionStringBuilder builder = new SQLiteConnectionStringBuilder();
+            builder.Version = 3;
+            builder.DataSource = fileName;
+            builder.FailIfMissing = true;
 
             // TODO: Einlesen
             if (File.Exists(fileName))//Wenn data.xml vorhanden 
             {
+                using (SQLiteConnection connection = new SQLiteConnection(builder.ToString()))
+                {
+                    connection.Open();
+                    SQLiteCommand command = connection.CreateCommand();
+                    command.CommandText = "select coffeeContainer, waterContainer, teaContainer from SavedSettings;";
+                    using (var resultReader = command.ExecuteReader())
+                    {
+                        resultReader.Read();
+                        containerCoffee = resultReader.GetByte(0);// coffeeContainer
+                        containerWater = resultReader.GetByte(1);// waterContainer
+                        containerTea = resultReader.GetByte(2);// teaContainer
+                    }
+                }
+
+                /* alte variante mit eine XML datei
                 using (var reader = new StreamReader(fileName))//     data.xml einlesen
                 {
                     BoxData data = (BoxData)serializer.Deserialize(reader);
                     containerCoffee = data.Coffee;
                     containerTea = data.Tea;
                     containerWater = data.Water;
-                }
+                }*/
             }
             else //andernfalls
             {
@@ -161,7 +182,7 @@ namespace KaffeeMaschine
                         Console.WriteLine("Kaffee wird ausgegeben"); //Getränk ausgeben
                         break;
                     case "Abschalten":
-                        Console.WriteLine("Auf Wiedersehen!"); 
+                        Console.WriteLine("Auf Wiedersehen!");
                         keepRunning = false;
                         break;
                     default:
@@ -174,6 +195,17 @@ namespace KaffeeMaschine
 
             //TODO: speichern
 
+            using (SQLiteConnection connection = new SQLiteConnection(builder.ToString()))
+            {
+                connection.Open();
+                SQLiteCommand command = connection.CreateCommand();
+                command.CommandText = "update SavedSettings set coffeeContainer = $containerCoffee, waterContainer = $containerWater, teaContainer = $containerTea;";
+                command.Parameters.AddWithValue("$containerCoffee", containerCoffee);
+                command.Parameters.AddWithValue("$containerWater", containerWater);
+                command.Parameters.AddWithValue("$containerTea", containerTea);
+                command.ExecuteNonQuery();
+            }
+            /* alter weg mit XML
             using (var writer = new StreamWriter(fileName))// Schreibzugriff auf datei anfordern
             {
                 // Werte der Containervariablen in Hilfsobjekt packen
@@ -185,7 +217,7 @@ namespace KaffeeMaschine
                 // Hilfsobjekt in XML umwandeln und in die datei speichern
                 serializer.Serialize(writer, data);
             }
-
+            */
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("erledigt.");
             Console.ResetColor();
