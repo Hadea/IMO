@@ -2,57 +2,33 @@
 using System.Data.SQLite;
 using System.IO;
 using System.Threading;
-using System.Xml.Serialization;
 
 namespace KaffeeMaschine
 {
-    class Program
+    static class Program
     {
-        static void Main() // doppelklick auf exe
+        const byte containerCoffeeMax = 200;
+        const byte containerWaterMax = 200;
+        const byte containerTeaMax = 200;
+        const string fileName = "Settings.db";
+        const byte progressMaximum = 40;
+        static byte containerCoffee;
+        static byte containerWater;
+        static byte containerTea;
+
+        static void Main(string[] args) // doppelklick auf exe
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(BoxData));
-
-            byte containerCoffee;
-            byte containerWater;
-            byte containerTea;
-
-            byte containerCoffeeMax = 200;
-            byte containerWaterMax = 200;
-            byte containerTeaMax = 200;
-
-            byte progressMaximum = 40;
-            string fileName = "Settings.db";
-
-            SQLiteConnectionStringBuilder builder = new SQLiteConnectionStringBuilder();
-            builder.Version = 3;
-            builder.DataSource = fileName;
-            builder.FailIfMissing = true;
+            if (args.Length > 0)
+            {
+                // wenn kommandozeilenparameter angegeben wurden
+                processArgs(args); // verarbeiten
+                return; // kaffeemaschine nicht hochfahren sondern direkt beenden
+            }
 
             // TODO: Einlesen
-            if (File.Exists(fileName))//Wenn data.xml vorhanden 
+            if (File.Exists(fileName))//Wenn Datenbank vorhanden 
             {
-                using (SQLiteConnection connection = new SQLiteConnection(builder.ToString()))
-                {
-                    connection.Open();
-                    SQLiteCommand command = connection.CreateCommand();
-                    command.CommandText = "select coffeeContainer, waterContainer, teaContainer from SavedSettings;";
-                    using (var resultReader = command.ExecuteReader())
-                    {
-                        resultReader.Read();
-                        containerCoffee = resultReader.GetByte(0);// coffeeContainer
-                        containerWater = resultReader.GetByte(1);// waterContainer
-                        containerTea = resultReader.GetByte(2);// teaContainer
-                    }
-                }
-
-                /* alte variante mit eine XML datei
-                using (var reader = new StreamReader(fileName))//     data.xml einlesen
-                {
-                    BoxData data = (BoxData)serializer.Deserialize(reader);
-                    containerCoffee = data.Coffee;
-                    containerTea = data.Tea;
-                    containerWater = data.Water;
-                }*/
+                LoadContainerDB();
             }
             else //andernfalls
             {
@@ -64,7 +40,7 @@ namespace KaffeeMaschine
 
             string logo;
 
-            using (StreamReader fs = new StreamReader("logo.txt"))
+            using (StreamReader fs = new("logo.txt"))
             {
                 logo = fs.ReadToEnd();
             }// macht automatisch das .Dispose() so dass man es nicht mehr vergessen kann.
@@ -78,18 +54,18 @@ namespace KaffeeMaschine
                 Console.WriteLine(logo);
                 Console.ResetColor();
 
-                int numberOfHashTags = containerCoffee / (containerCoffeeMax / progressMaximum);
 
                 Console.Write("\nKaffee: ");
-                drawProgress(numberOfHashTags, progressMaximum);
+                int filledFields = containerCoffee / (containerCoffeeMax / progressMaximum);
+                drawProgress(filledFields);
 
                 Console.Write("\nWasser: ");
-                numberOfHashTags = containerWater / (containerWaterMax / progressMaximum);
-                drawProgress(numberOfHashTags, progressMaximum);
+                filledFields = containerWater / (containerWaterMax / progressMaximum);
+                drawProgress(filledFields);
 
                 Console.Write("\nTee   : ");
-                numberOfHashTags = containerTea / (containerTeaMax / progressMaximum);
-                drawProgress(numberOfHashTags, progressMaximum);
+                filledFields = containerTea / (containerTeaMax / progressMaximum);
+                drawProgress(filledFields);
 
                 //Kaffee/Tee Auswahlmenü anzeigen
                 drawMenu();
@@ -130,19 +106,6 @@ namespace KaffeeMaschine
                         {
                             Console.WriteLine("Leider hat eine Prüfung nicht geklappt, bitte wählen sie ein anderes Produkt");
                         }
-
-                        /*
-                        if (containerTea >= 5 && containerWater >= 10)
-                        {
-                            containerWater -= 10;
-                            containerTea -= 5;
-                            Console.WriteLine("Tee wird ausgegeben"); //Getränk ausgeben
-                        }
-                        else
-                        {
-                            Console.WriteLine("Nicht genügend ressourcen, bitte was anderes wählen");
-                        }*/
-
                         break;
                     case "Wasser":
                         if (containerWater < 10)
@@ -178,8 +141,6 @@ namespace KaffeeMaschine
                         {
                             Console.WriteLine("Leider hat eine Prüfung nicht geklappt, bitte wählen sie ein anderes Produkt");
                         }
-
-                        Console.WriteLine("Kaffee wird ausgegeben"); //Getränk ausgeben
                         break;
                     case "Abschalten":
                         Console.WriteLine("Auf Wiedersehen!");
@@ -194,6 +155,154 @@ namespace KaffeeMaschine
             Console.Write("Kaffeemaschine speichert ... ");
 
             //TODO: speichern
+            if (!File.Exists(fileName))
+            {
+                // Datenbank existiert nicht, also neu erzeugen.
+                CreateDB();
+            }
+            SaveContainerDB();
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("erledigt.");
+            Console.ResetColor();
+            Console.WriteLine("Kaffeemaschine beendet sich");
+
+        }
+
+        static void processArgs(string[] args)
+        {
+            //Hack: nur ein parameter wird ausgewertet, mehr als einer ist ein fehler und druckt die hilfe
+            if (args.Length > 1)
+            {
+                Console.WriteLine("Only one Parameter allowed.");
+                args[0] = String.Empty; // leeren des ersten parameter damit die Hilfe im switch gezeigt wird
+            }
+
+            switch (args[0])
+            {
+                case "/reset":
+                    Console.WriteLine("Erstelle die Datenbank neu mit Standardwerten");
+                    CreateDB();
+                    break;
+                default:
+                    Console.WriteLine(@"
+NAME
+	KaffeeMaschine
+
+OVERVIEW
+	Starts or configures a coffee dispenser.
+
+SYNTAX
+	KaffeeMaschine [/reset]
+
+DESCRIPTION:
+	This program starts a coffe dispenser where you can choose your favorite drink.
+	It will use the ressources (if available) to brew your drink.
+
+PARAMETER
+	/?
+		Shows this help.
+
+	/reset
+		Deletes the database file if it exists and creates a new with standard settings.
+		All container will be marked as empty with no favorite drink.
+"); //TODO: hilfetext
+                    break;
+            }
+        }
+
+        private static void CreateDB()
+        {
+            if (File.Exists(fileName))
+            {
+                Console.WriteLine("Lösche alte Datenbank");
+                File.Delete(fileName);
+            }
+
+            SQLiteConnectionStringBuilder builder = new();
+            builder.Version = 3;
+            builder.DataSource = fileName;
+            builder.FailIfMissing = false; // erstellt die datei bei einem Verbindungsversuch automatisch falls sie nicht da ist
+
+            Console.WriteLine("Erstelle neue Datenbankdatei");
+            using (SQLiteConnection connection = new(builder.ToString()))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandType = System.Data.CommandType.Text;
+
+                Console.Write("Erstelle Tabellen ... ");
+                command.CommandText = @"create table recipies (
+                    ID tinyint unsigned not null primary key,
+                    Name varchar(20) not null unique,
+                    CoffeeAmount tinyint not null default 0,
+                    CoffeeMultiplier decimal(3, 2) not null default 1,
+                    WaterAmount tinyint not null default 0,
+                    WaterMultiplier decimal(3, 2) not null default 1,
+                    TeaAmount tinyint not null default 0,
+                    TeaMultiplier decimal(3, 2) not null default 1,
+                    
+                    constraint ccRecipies_CoffeeMultiplier check(CoffeeMultiplier between 0.5 and 4),
+                    constraint ccRecipies_WaterMultiplier check(WaterMultiplier between 0.5 and 4),
+                    constraint ccRecipies_TeaMultiplier check(TeaMultiplier between 0.5 and 4)
+                    );
+                    create table SavedSettings (
+                        coffeeContainer tinyint unsigned not null,
+                        waterContainer tinyint unsigned not null,
+                        teaContainer tinyint unsigned not null,
+                        lastProduct tinyint unsigned null,
+                        constraint ccSavedSettings_waterContainerMax check ( waterContainer < 201  ),
+                        constraint fkSavedSettings_Recipies foreign key (lastProduct) references Recipies (ID)
+                    );";
+                command.ExecuteNonQuery();
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("erledigt");
+                Console.ResetColor();
+
+                Console.Write("Erstelle Standardinhalte ... ");
+                command.CommandText = @"insert into SavedSettings values
+                    (0,0,0,null);
+                    
+                    insert into recipies (Name, CoffeeAmount, WaterAmount, TeaAmount, ID) values
+                    ('Kaffee', 5,10,0,1),
+                    ('Tee',0,10,3,2),
+                    ('Wasser',0,10,0,3)";
+                command.ExecuteNonQuery();
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("erledigt");
+                Console.ResetColor();
+            }
+        }
+
+        private static void LoadContainerDB()
+        {
+            SQLiteConnectionStringBuilder builder = new SQLiteConnectionStringBuilder();
+            builder.Version = 3;
+            builder.DataSource = fileName;
+            builder.FailIfMissing = true;
+
+            using (SQLiteConnection connection = new SQLiteConnection(builder.ToString()))
+            {
+                connection.Open();
+                SQLiteCommand command = connection.CreateCommand();
+                command.CommandText = "select coffeeContainer, waterContainer, teaContainer from SavedSettings;";
+                using (var resultReader = command.ExecuteReader())
+                {
+                    resultReader.Read();
+                    containerCoffee = resultReader.GetByte(0);// coffeeContainer
+                    containerWater = resultReader.GetByte(1);// waterContainer
+                    containerTea = resultReader.GetByte(2);// teaContainer
+                }
+            }
+        }
+
+        private static void SaveContainerDB()
+        {
+
+            SQLiteConnectionStringBuilder builder = new SQLiteConnectionStringBuilder();
+            builder.Version = 3;
+            builder.DataSource = fileName;
+            builder.FailIfMissing = true;
 
             using (SQLiteConnection connection = new SQLiteConnection(builder.ToString()))
             {
@@ -203,26 +312,9 @@ namespace KaffeeMaschine
                 command.Parameters.AddWithValue("$containerCoffee", containerCoffee);
                 command.Parameters.AddWithValue("$containerWater", containerWater);
                 command.Parameters.AddWithValue("$containerTea", containerTea);
+                //TODO: favorit/letzte auswahl speichern
                 command.ExecuteNonQuery();
             }
-            /* alter weg mit XML
-            using (var writer = new StreamWriter(fileName))// Schreibzugriff auf datei anfordern
-            {
-                // Werte der Containervariablen in Hilfsobjekt packen
-                BoxData data = new BoxData();
-                data.Coffee = containerCoffee;
-                data.Tea = containerTea;
-                data.Water = containerWater;
-
-                // Hilfsobjekt in XML umwandeln und in die datei speichern
-                serializer.Serialize(writer, data);
-            }
-            */
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("erledigt.");
-            Console.ResetColor();
-            Console.WriteLine("Kaffeemaschine beendet sich");
-
         }
 
         private static void displayError(string ContainerName)
@@ -256,9 +348,9 @@ namespace KaffeeMaschine
             Console.WriteLine("Abschalten -> Schaltet die Maschine aus");
         }
 
-        static void drawProgress(int currentValue, int maximumValue)
+        static void drawProgress(int currentValue)
         {
-            for (int i = 0; i < maximumValue; i++)
+            for (int i = 0; i < progressMaximum; i++)
             {
                 if (i < currentValue)
                 {
@@ -270,15 +362,7 @@ namespace KaffeeMaschine
                 }
                 Console.Write(" ");
             }
-
             Console.ResetColor();
         }
-    }
-
-    public class BoxData
-    {
-        public byte Coffee;
-        public byte Water;
-        public byte Tea;
     }
 }
